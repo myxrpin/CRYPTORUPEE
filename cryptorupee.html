@@ -1,0 +1,334 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Risk Per Trade Calculator – Buy &amp; Sell</title>
+    <meta name="description" content="Free, fast risk-per-trade calculator for buy and sell setups. Calculates quantity and target price instantly in your browser.">
+    <meta name="robots" content="index,follow">
+
+    <!-- Optional: Google Analytics (replace G-XXXX with your ID)
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);} gtag('js', new Date());
+      gtag('config', 'G-XXXX');
+    </script>
+    -->
+
+    <style>
+        :root {
+            --bg: #000000; /* page background */
+            --card: #0d0d0d; /* card background */
+            --muted: #aaaaaa; /* muted text */
+            --text: #ffffff; /* normal text */
+            --accent: #40045f; /* button + highlight (kept same blue accent) */
+            --danger: #ff5e7a; /* error red */
+            --ok: #18c98a; /* success green */
+        }
+
+
+        * {
+            box-sizing: border-box
+        }
+
+        html, body {
+            margin: 0;
+            height: 100%;
+        }
+
+        body {
+            font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .out pre {
+            font-size: 0.8rem; /* same size as error text */
+            font-weight: 600; /* bold like error */
+            margin: 0; /* remove extra gap */
+            white-space: pre-wrap; /* keep formatting but wrap nicely on mobile */
+        }
+
+
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 24px
+        }
+
+        header {
+            margin-bottom: 24px
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 6px
+        }
+
+        h3 {
+            font-weight: 500;
+            color: var(--muted);
+            margin: 0
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px
+        }
+
+        @media(min-width:840px) {
+            .grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25)
+        }
+
+            .card h2 {
+                margin: 0 0 12px;
+                font-size: 1.3rem
+            }
+
+        label {
+            display: block;
+            font-size: .92rem;
+            color: var(--muted);
+            margin: 10px 0 6px
+        }
+
+        input[type=number] {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.08);
+            background: #0e1430;
+            color: var(--text);
+            outline: none
+        }
+
+            input[type=number]:focus {
+                border-color: var(--accent)
+            }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px
+        }
+
+        @media(min-width:520px) {
+            .row {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .btn {
+            appearance: none;
+            border: 0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .btn-secondary {
+            background: #202851;
+            color: #fff
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: not-allowed
+        }
+
+        .out {
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: #0d1433;
+            border: 1px dashed rgba(255,255,255,.12);
+            min-height: 58px
+        }
+
+        .ok {
+            color: var(--ok)
+        }
+
+        .err {
+            color: var(--danger);
+            font-weight: 600
+        }
+
+        small.meta {
+            display: block;
+            color: var(--muted);
+            margin-top: 12px
+        }
+
+        footer {
+            margin-top: 28px;
+            color: var(--muted);
+            font-size: .9rem
+        }
+
+        a {
+            color: var(--accent)
+        }
+    </style>
+    <style>
+        :is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {
+            display: none !important;
+            min-height: 0 !important;
+            height: 0 !important;
+        }
+    </style>
+<style>:is([id*='google_ads_iframe'],[id*='taboola-'],.taboolaHeight,.taboola-placeholder,#top-ad,#credential_picker_container,#credentials-picker-container,#credential_picker_iframe,[id*='google-one-tap-iframe'],#google-one-tap-popup-container,.google-one-tap__module,.google-one-tap-modal-div,#amp_floatingAdDiv,#ez-content-blocker-container) {display:none!important;min-height:0!important;height:0!important;}</style></head>
+<body>
+    <main class="wrap">
+        <header>
+            <h1>Welcome to Family</h1>
+            <h3>We are working on updates right now</h3>
+            <h4>This is to limit your risk on every trade</h4>
+        </header>
+
+        <section class="grid" aria-label="Risk Calculator">
+            <!-- BUY SIDE -->
+            <article class="card" aria-labelledby="buyTitle">
+                <h2 id="buyTitle">For Buy Side</h2>
+                <div class="row">
+                    <div>
+                        <label for="buyEntry">Entry Price</label>
+                        <input id="buyEntry" type="number" step="0.01" inputmode="decimal" placeholder="e.g., 6700" data-ddg-inputtype="unknown">
+                    </div>
+                    <div>
+                        <label for="buySL">Stop Loss Price</label>
+                        <input id="buySL" type="number" step="0.01" inputmode="decimal" placeholder="e.g., 6680" data-ddg-inputtype="unknown">
+                    </div>
+                    <div>
+                        <label for="buyRisk">Amount you want to Risk (₹)</label>
+                        <input id="buyRisk" type="number" step="0.01" inputmode="decimal" placeholder="e.g., 1000" data-ddg-inputtype="unknown">
+                    </div>
+                    <div style="display:flex;align-items:flex-end;gap:8px">
+                        <button id="buyCalc" class="btn btn-primary" type="button">Calculate </button>
+                        <button id="buyClear" class="btn btn-secondary" type="button" title="Clear fields">Clear</button>
+                    </div>
+                </div>
+                <div id="buyOut" class="out" aria-live="polite"></div>
+
+            </article>
+
+            <!-- SELL SIDE -->
+            <article class="card" aria-labelledby="sellTitle">
+                <h2 id="sellTitle">For Sell Side</h2>
+                <div class="row">
+                    <div>
+                        <label for="sellEntry">Entry Price</label>
+                        <input id="sellEntry" type="number" step="0.01" inputmode="decimal" placeholder="e.g., 6700" data-ddg-inputtype="unknown">
+                    </div>
+                    <div>
+                        <label for="sellSL">Stop Loss Price</label>
+                        <input id="sellSL" type="number" step="0.01" inputmode="decimal" placeholder="e.g., 6720" data-ddg-inputtype="unknown">
+                    </div>
+                    <div>
+                        <label for="sellRisk">Amount you want to Risk (₹)</label>
+                        <input id="sellRisk" type="number" step="0.01" inputmode="decimal" placeholder="e.g., 1000" data-ddg-inputtype="unknown">
+                    </div>
+                    <div style="display:flex;align-items:flex-end;gap:8px">
+                        <button id="sellCalc" class="btn btn-primary" type="button">Calculate </button>
+                        <button id="sellClear" class="btn btn-secondary" type="button" title="Clear fields">Clear</button>
+                    </div>
+                </div>
+                <div id="sellOut" class="out" aria-live="polite"></div>
+
+            </article>
+        </section>
+
+        <!-- Optional: AdSense (after approval). Replace with your client + slot. Place where you want ads to show. -->
+        <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXX" data-ad-slot="YYYY" data-ad-format="auto"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+
+        <footer>
+            <p>Made for education &amp; quick sizing. No personal data is collected. Not financial advice.</p>
+        </footer>
+    </main>
+
+    <script>
+        // Formatters
+        const RsFmt = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const PxFmt = new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+
+        function val(id) { return parseFloat(document.getElementById(id).value); }
+        function clearBuy() { ['buyEntry', 'buySL', 'buyRisk'].forEach(i => document.getElementById(i).value = ''); }
+        function clearSell() { ['sellEntry', 'sellSL', 'sellRisk'].forEach(i => document.getElementById(i).value = ''); }
+
+        function buyCalc() {
+            const ep = val('buyEntry'), sl = val('buySL'), risk = val('buyRisk');
+            const out = document.getElementById('buyOut');
+            if ([ep, sl, risk].some(n => Number.isNaN(n))) {
+                out.innerHTML = '<span class="err">Please enter valid numbers for Entry, Stop Loss and Risk.</span>'; return;
+            }
+            const riskPerUnit = ep - sl;
+            if (riskPerUnit <= 0) {
+                out.innerHTML = '<span class="err">Entry Price must be greater than Stop Loss for a Buy setup.</span>'; return;
+            }
+            const qty = risk / riskPerUnit;
+            const target = ep + riskPerUnit;
+
+            out.innerHTML =
+                `<pre>
+Entry Price       : ${PxFmt.format(ep)} ✅
+Stop Loss Price   : ${PxFmt.format(sl)} 🛑
+Target Price      : ${PxFmt.format(target)} 🎯
+
+Quantity          : ${qty.toFixed(4)} ⚖️
+Risk (₹)          : ${RsFmt.format(risk)} 💰
+</pre>`;
+            clearBuy();
+        }
+
+        function sellCalc() {
+            const ep = val('sellEntry'), sl = val('sellSL'), risk = val('sellRisk');
+            const out = document.getElementById('sellOut');
+            if ([ep, sl, risk].some(n => Number.isNaN(n))) {
+                out.innerHTML = '<span class="err">Please enter valid numbers for Entry, Stop Loss and Risk.</span>'; return;
+            }
+            const riskPerUnit = sl - ep; // SL above entry
+            if (riskPerUnit <= 0) {
+                out.innerHTML = '<span class="err">Stop Loss must be greater than Entry Price for a Sell setup.</span>'; return;
+            }
+            const qty = risk / riskPerUnit;
+            const target = ep - riskPerUnit;
+
+            out.innerHTML =
+                `<pre>
+Entry Price       : ${PxFmt.format(ep)} ✅
+Stop Loss Price   : ${PxFmt.format(sl)} 🛑
+Target Price      : ${PxFmt.format(target)} 🎯
+
+Quantity          : ${qty.toFixed(4)} ⚖️
+Risk (₹)          : ${RsFmt.format(risk)} 💰
+</pre>`;
+            clearSell();
+        }
+
+        document.getElementById('buyCalc').addEventListener('click', buyCalc);
+        document.getElementById('sellCalc').addEventListener('click', sellCalc);
+        document.getElementById('buyClear').addEventListener('click', () => { document.getElementById('buyOut').innerHTML = ''; clearBuy(); });
+        document.getElementById('sellClear').addEventListener('click', () => { document.getElementById('sellOut').innerHTML = ''; clearSell(); });
+    </script>
+
+
+
+
+</body></html>
